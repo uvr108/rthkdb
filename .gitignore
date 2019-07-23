@@ -1,0 +1,17 @@
+rthkdb/*.csv
+rthkdb/*.txt
+rthkdb/*.swp
+rthkdb/*.pyc
+informes/*.csv
+informes/*.zip
+informes/*.swp
+rthkdb.egg-info/
+rthkdb/__pycache__/
+informes/eventos
+*.html
+*.zip
+informes/
+.idea/*
+rthkdb/.idea/
+rthkdb/trash/
+rthkdb/xx
