@@ -4,10 +4,11 @@ from datetime import timedelta, datetime, timezone
 import pytz
 import os
 import datetime
+from urllib.request import urlopen
 
 rt_host = os.environ['rt_host']
 rt_port = os.environ['rt_port']
-rt_db = "csn"
+rt_db = os.environ['rt_db'] 
 
 
 class Continuos:
@@ -134,7 +135,15 @@ class Continuos:
         def contar(tab,prim,seg,ind,wh):
             return r.table(tab).get_all([prim,seg],index=ind).filter(wh).count().run(self.conn)
 
+        def alerta_final(sfile,tipo):
+
+            html = urlopen("http://localhost:8000/%s/%s" % (sfile,tipo))
+            # with open("output.txt",'w') as output:
+            #    output.write(html.read().decode("utf-8")) 
+            # output.close()
+
         if msg['option'] == 'insert':
+
 
             primero = dictio['ano_sfile']
             segundo = dictio['mes_sfile']
@@ -146,6 +155,20 @@ class Continuos:
                      
             r.table(table).insert(dictio).run(self.conn)
 
+            # +++++++++ MENSAJES GESTION ++++++++++++
+            if dictio['up'] == None:
+                if dictio['m1_magnitud'] >= 3.7:
+                    if dictio['retardo'] > 5.0: 
+                        alerta_final(dictio['sfile'],dictio['tipo_estadistica'])
+
+            if dictio['up'] == 0:
+                if dictio['m1_magnitud'] >= 3.7:
+                    if dictio['retardo'] > 20.0: 
+                        alerta_final(dictio['sfile'],dictio['tipo_estadistica']) 
+            # ++++++++++++++++++++++++++++++++++++++++
+
+                      
+ 
         elif msg['option'] == 'update':
            
             """
@@ -164,6 +187,7 @@ class Continuos:
                 where = {'sfile': dictio['sfile'],'tipo_estadistica':'final', 'version': version}
 
             r.table(table).get_all([primero,segundo],index=indice).filter(where).update(setea).run(self.conn)
+            
            
         elif msg['option'] == 'sensible': 
 
@@ -173,7 +197,21 @@ class Continuos:
 
             setea = {'sensible': True}
 
-            r.table(table).get_all([primero,segundo],index=indice).filter({'sfile':dictio['sfile']}).update(setea).run(self.conn)
+            cons = r.table(table).get_all([primero,segundo],index=indice)
+            cons.filter({'sfile':dictio['sfile']}).update(setea).run(self.conn)
+            
+            # ++++++++ MENSAJES GESTION ++++++++++++
+
+            retardo1 = cons.filter({'sfile':dictio['sfile'],'up':None}).pluck('retardo').run(self.conn)
+            retardo2 = cons.filter({'sfile':dictio['sfile'],'up':0}).pluck('retardo').run(self.conn)
+
+            r1 = [ ret['retardo'] for ret in retardo1 ][0]
+            r2 = [ ret['retardo'] for ret in retardo2 ][0]
+            
+            if r1 > 5.0 or r2 > 20.0: 
+                alerta_final(dictio['sfile'],'sensible')
+
+            # ++++++++++++++++++++++++++++++++++++++
 
 if __name__ == "__main__":
     pass
