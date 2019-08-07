@@ -119,11 +119,14 @@ if __name__ == "__main__":
         
     print(indice)
  
+    """
+
     pluck = ['SFILE',{'DATA':['JL','YEAR',{'HYPO':['latitud','no','magnitud','prof','tipo','fecha_origen']}]}] 
         
     kw = {'table':'eventos', 'option':'select', 'indice' : indice, 'pluck' : pluck}
      
     r.table('ratio').insert(genera(cont,{'message' : kw})).run(conn)
-    
+    """
+
     del(cont)
     conn.close()
