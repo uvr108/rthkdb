@@ -137,7 +137,7 @@ class Continuos:
 
         def alerta_final(sfile,tipo):
 
-            html = urlopen("http://localhost:8000/%s/%s" % (sfile,tipo))
+            html = urlopen("http://127.0.0.1:8000/%s/%s" % (sfile,tipo))
             # with open("output.txt",'w') as output:
             #    output.write(html.read().decode("utf-8")) 
             # output.close()
