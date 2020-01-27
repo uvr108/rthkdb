@@ -1,4 +1,4 @@
-import rethinkdb as r
+import rethinkdb as rdb
 from rethinkdb.errors import RqlRuntimeError
 from datetime import timedelta, datetime, timezone
 import pytz
@@ -17,6 +17,7 @@ class Continuos:
 
         if conn == None:
             print(f'connect to : host={rt_host} port={rt_port} db={rt_db}')
+            r=rdb.RethinkDB()
             self.conn = r.connect(host=rt_host, port=rt_port, db=rt_db)
         else:
             self.conn = conn
@@ -61,6 +62,7 @@ class Continuos:
 
         if msg['option'] == 'select':
 
+            r=rdb.RethinkDB()
             todas = r.table(table)
 
             if msg.get('indice'):
@@ -214,4 +216,6 @@ class Continuos:
             # ++++++++++++++++++++++++++++++++++++++
 
 if __name__ == "__main__":
-    pass
+   
+    con = Continuos()
+    del con 
